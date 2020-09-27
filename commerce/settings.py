@@ -120,3 +120,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#using this to setup the path to serve dynamically user provided images on the
+#website, help from
+#https://stackoverflow.com/questions/52452687/django-imagefield-will-not-display-on-webpage
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
