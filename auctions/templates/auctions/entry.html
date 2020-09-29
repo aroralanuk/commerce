@@ -1,0 +1,92 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="container m-2">
+        <h2>{{item.title}}</h2>
+        {% if user.is_authenticated %}            
+                <!-- <div class="custom-control custom-switch">
+                    <form action="{% url 'watchlist' %}" method="post">
+                        {% csrf_token %}
+                        {% if watchlisted %}
+                            <input type="checkbox" class="custom-control-input"
+                        id="customSwitches" value="{{item.id}}" name="watchlist"
+                        checked>
+                        {% else %}
+                            <input type="checkbox" class="custom-control-input"
+                        id="customSwitches" value="{{item.id}}" name="watchlist">
+                        {% endif %}
+                        <label class="custom-control-label"
+                        for="customSwitches">Watchlisted</label>
+                    </form> 
+                </div> -->
+
+                <form action="{% url 'watchlist' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" value="{{ item.id }}" name="watchlist" 
+                        {% if watchlisted %}
+                            class="btn btn-outline-danger"
+                        {% else %} 
+                            class="btn btn-outline-primary"
+                        {% endif %}
+                    >
+                        {% if watchlisted %}
+                            Remove from Watchlist
+                        {% else %}
+                            Add to Watchlist
+                        {% endif %}
+                    </button>
+                </form> 
+
+
+                
+        {% endif %}
+        
+        {% if item.image %}
+            <img src="{{item.image.url}}" alt="'{{item.title}}' listing image"
+            class="my-3" style="max-width: 50vw; height:50vh">
+        {% else %}
+            <img src="/static/auctions/default.jpg" alt="'{{item.title}}' listing image"
+        class="my-3" style="max-width: 50vw; height:50vh">    
+        {% endif %}
+        <p class="lead">{{item.description}}</p>
+        <p>Current price:  <span style="font-size: 2rem;font-weight:
+        bold;">${{bid.amt}}</span> </p>
+        {% if user.is_authenticated %}
+            {% if item.active %}
+                {% if user != item.owner and user != bid.bidder %}
+
+                {% if bid_added %}
+                <div class="alert alert-succes" role="alert">
+                    Your bid was added. Congratulations! you now have the highest bid.
+                  </div>
+                {% elif bid_added %}
+                <div class="alert alert-danger" role="alert">
+                    You're bidding amount much be more than the current highest bid.
+                  </div>
+                {% endif %}
+
+                <form action="{%url 'place_bid' item.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="number" name="bid" placeholder="enter your bid here">
+                        <button type="submit" class="btn btn-primary mb-2">Place bid</button>
+                    </div>
+                </form>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+
+        <ul class="list-group">
+            <h5>Comments</h5>
+            {% for comment in comments %}
+            <li class="list-group-item mx-0" style="border: 0px solid transparent">
+                <p class="m-0">{{comment.comment}}</p>
+                <p class="m-0"><small>by {{comment.user}} <span class="text-muted">at {{comment.created_at}}</span> </small></p>
+            </li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+{% endblock %}

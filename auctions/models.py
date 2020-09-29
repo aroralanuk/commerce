@@ -34,10 +34,10 @@ class   Bid(models.Model):
 
 class WatchList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="myWatchList")
-    listing_id = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="inPeoplesWatchList")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="inPeoplesWatchList")
     
     def __str__(self):
-        return f"{self.user}'s watchList'"
+        return f"{self.user}'s watchList"
 
 class Comment(models.Model):
     comment = models.TextField()
