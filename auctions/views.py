@@ -7,6 +7,8 @@ from django.urls import reverse
 from .models import User, Listing, Comment, Catergory, WatchList, Bid
 
 
+
+
 def index(request):
     return render(request, "auctions/index.html",{
         "listings": Listing.objects.all()
@@ -64,7 +66,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-def displayListing(request, item_id):
+def displayListing(request, item_id, bid_message=0):
     user = request.user.id
     item = Listing.objects.get(id=item_id)
     try:
@@ -77,7 +79,8 @@ def displayListing(request, item_id):
         "item": item,
         "bid": highestBid,
         "comments": comments,
-        "watchlisted": watchlisted
+        "watchlisted": watchlisted,
+        "bid_message": bid_message
     })
 
 def toggleWL(request):
@@ -100,14 +103,16 @@ def place_bid(request, item_id):
             curr_highest_bid = Listing.objects.filter(id=item_id).first().minPrice
         offered = int(request.POST['bid'])
         print(f"amt: {curr_highest_bid}, offer: {offered}")
+        # global bid_added
         if offered > curr_highest_bid:
             new_bid = Bid(bidder=request.user,amt=offered, listing_id_id=item_id)
             new_bid.save()
-            added = 1
+            bid_added = 1
         else:
-            added = 2
+            bid_added = 2
              
-        response = HttpResponseRedirect(reverse("listing", args=[item_id]))
-        response.set_cookie(key='bid_added',value='added')
-        return response
+        return displayListing(request, item_id, bid_added)
+
+def close_bid(request, item_id):
+    return displayListing(request, item_id)
         

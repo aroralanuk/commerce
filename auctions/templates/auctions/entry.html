@@ -49,30 +49,42 @@
             <img src="/static/auctions/default.jpg" alt="'{{item.title}}' listing image"
         class="my-3" style="max-width: 50vw; height:50vh">    
         {% endif %}
+
         <p class="lead">{{item.description}}</p>
-        <p>Current price:  <span style="font-size: 2rem;font-weight:
+
+        {% if user.is_authenticated %}
+            {% if item.active %}
+                {% if bid_message == 1%}
+                    <div class="alert alert-success" role="alert">
+                        Your bid was added. Congratulations! you now have the highest bid.
+                    </div>
+                {% elif bid_message == 2 %}
+                    <div class="alert alert-danger" role="alert">
+                        You're bidding amount much be more than the current highest bid.
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        
+        <p class="my-0">Current price:  <span style="font-size: 2rem;font-weight:
         bold;">${{bid.amt}}</span> </p>
         {% if user.is_authenticated %}
             {% if item.active %}
+                
                 {% if user != item.owner and user != bid.bidder %}
 
-                {% if bid_added %}
-                <div class="alert alert-succes" role="alert">
-                    Your bid was added. Congratulations! you now have the highest bid.
-                  </div>
-                {% elif bid_added %}
-                <div class="alert alert-danger" role="alert">
-                    You're bidding amount much be more than the current highest bid.
-                  </div>
-                {% endif %}
-
-                <form action="{%url 'place_bid' item.id %}" method="post">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <input type="number" name="bid" placeholder="enter your bid here">
-                        <button type="submit" class="btn btn-primary mb-2">Place bid</button>
-                    </div>
-                </form>
+                    <form action="{%url 'place_bid' item.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="number" name="bid" placeholder="enter your bid here">
+                            <button type="submit" class="btn btn-primary mb-2">Place bid</button>
+                        </div>
+                    </form>
+                
+                {% elif user == item.owner %}
+                    <a href="{% url 'close_bid' item.id %}"><button class="btn
+                    btn-outline-warning btn-lg mb-2">Close Bid</button></a>
                 {% endif %}
             {% endif %}
         {% endif %}
