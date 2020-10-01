@@ -4,7 +4,7 @@
 
     <div class="container m-2">
         <h2>{{item.title}}</h2>
-        {% if user.is_authenticated %}            
+        {% if user.is_authenticated and user != item.owner %}            
                 <!-- <div class="custom-control custom-switch">
                     <form action="{% url 'watchlist' %}" method="post">
                         {% csrf_token %}
@@ -91,19 +91,40 @@
                 {% elif user == item.owner %}
                     <a href="{% url 'close_bid' item.id %}"><button class="btn
                     btn-outline-warning btn-lg mb-2">Close Bid</button></a>
+
+                {% elif user == bid.bidder %}
+                    <div class="alert alert-success" role="alert">
+                        You currently are the highest bidder!
+                    </div>
+                    
                 {% endif %}
             {% endif %}
         {% endif %}
 
 
-        <ul class="list-group">
+        <ul class="list-group mt-3">
             <h5>Comments</h5>
-            {% for comment in comments %}
-            <li class="list-group-item mx-0" style="border: 0px solid transparent">
-                <p class="m-0">{{comment.comment}}</p>
-                <p class="m-0"><small>by {{comment.user}} <span class="text-muted">at {{comment.created_at}}</span> </small></p>
-            </li>
-            {% endfor %}
+            {% if not comments %}
+            No comments yet!
+            {% else %}
+                {% for comment in comments %}
+                <li class="list-group-item m-0" style="border: 0px solid transparent">
+                    <p class="m-0">{{comment.comment}}</p>
+                    <p class="m-0"><small>by {{comment.user}} <span class="text-muted">at {{comment.created_at}}</span> </small></p>
+                </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if user != item.owner %}
+                <form action="{% url 'add_comment' item.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group mx-2">
+                        <label for="comment_new"><b>Write a comment:</b></label>
+                        <textarea class="form-control" id="comment_new" name="comment" placeholder="Write your comment here..." required></textarea>
+                    </div>
+                    <button class="btn btn-outline-info m-2" type="submit">Submit</button>
+                </form>
+            {% endif %}
         </ul>
         
     </div>

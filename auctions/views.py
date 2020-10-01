@@ -117,16 +117,31 @@ def place_bid(request, item_id):
 
 def close_bid(request, item_id):
     user = request.user
-    if user.is_authenticated:
-        closing_now = Listing.objects.get(id=item_id)
-        closing_now.update(active=False)
-        closed = WinningBid()
-        closed.sold = closing_now
-        closed.seller = user
+    
+    closing_now = Listing.objects.get(id=item_id)
+    closing_now.active = False
+    closed = WinningBid()
+    closed.sold = closing_now
+    closed.seller = user
+    try:
+        closed.buyer = Bid.objects.filter(listing_id=item_id).order_by('-amt').first().bidder
+        closed.amt = Bid.objects.filter(listing_id=item_id).order_by('-amt').first().amt
+    except:
+        closed.buyer = user
+        closed.amt = Listing.objects.filter(owner=user).first().minPrice
+    closed.save()
+    closing_now.save()
+    return HttpResponseRedirect(reverse("listing",args=[item_id]))  
+
+def add_comment(request, item_id):
+    if request.method == 'POST':
+        new_c = Comment()
+        new_c.comment = request.POST['comment']
+        new_c.user = request.user
         try:
-            closed.buyer = Bid.objects.filter(listing_id=item_id).order_by('-amt').first().bidder
-            closed.amt = Bid.objects.filter(listing_id=item_id).order_by('-amt').first().amt
+            new_c.listing_id = Listing.objects.get(id=item_id)
         except:
-            pass
-        return displayListing(request, item_id)
+            return HttpResponseRedirect(reverse("index"))
+        new_c.save()
+        return HttpResponseRedirect(reverse("listing",args=[item_id])) 
         
