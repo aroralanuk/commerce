@@ -48,3 +48,8 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user}'s comment: \"{self.comment}\""
     
+class WinningBid(models.Model):
+    sold = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="winning_bid")
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="selling_this")
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="buying_this")
+    amt = models.IntegerField()

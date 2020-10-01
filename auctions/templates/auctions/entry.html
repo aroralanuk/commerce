@@ -68,7 +68,13 @@
 
         
         <p class="my-0">Current price:  <span style="font-size: 2rem;font-weight:
-        bold;">${{bid.amt}}</span> </p>
+        bold;">
+        {% if bid.amt %}
+            ${{bid.amt}}
+        {% else %}
+            ${{item.minPrice}}
+        {% endif %}
+        </span> </p>
         {% if user.is_authenticated %}
             {% if item.active %}
                 
