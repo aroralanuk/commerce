@@ -144,4 +144,17 @@ def add_comment(request, item_id):
             return HttpResponseRedirect(reverse("index"))
         new_c.save()
         return HttpResponseRedirect(reverse("listing",args=[item_id])) 
+
+def categories(request):
+    cats = set(Listing.objects.only('category'))
+    return render(request,"auctions/categories.html",{
+        "categories": cats
+    })
+
+def filterByCat(request, cat):
+    category = Catergory.objects.get(title=cat)
+    return render(request, "auctions/category.html",{
+        "category": cat,
+        "listings": Listing.objects.filter(category = category)
+    })
         

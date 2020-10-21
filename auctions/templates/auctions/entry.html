@@ -115,7 +115,7 @@
                 {% endfor %}
             {% endif %}
 
-            {% if user != item.owner %}
+            {% if user.is_authenticated and user != item.owner %}
                 <form action="{% url 'add_comment' item.id %}" method="POST">
                     {% csrf_token %}
                     <div class="form-group mx-2">
