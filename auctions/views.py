@@ -3,9 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 
 from .models import User, Listing, Comment, Catergory, WatchList, Bid, WinningBid
-
 
 
 
@@ -157,4 +157,27 @@ def filterByCat(request, cat):
         "category": cat,
         "listings": Listing.objects.filter(category = category)
     })
-        
+
+def createListing(request):
+    categories = Catergory.objects.all()
+
+    return render(request,"auctions/createListing.html",{
+        "categories": set(Catergory.objects.only('title'))
+    })
+
+def submitListing(request):
+    user = request.user
+    if user.is_authenticated and request.method == 'POST':
+        newListing = Listing()
+        newListing.owner = user
+        newListing.title = request.POST['title']
+        newListing.category_id = request.POST['category']
+        newListing.description = request.POST['description']
+        newListing.minPrice = request.POST['minPrice']
+        if request.POST.get('image'):
+            newListing.image = request.POST.get('image')
+        newListing.active = True
+        newListing.save()
+        return HttpResponseRedirect(reverse("listing",args=[newListing.id]))
+    else:
+        return HttpResponseRedirect(reverse('index'))
